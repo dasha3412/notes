@@ -1,13 +1,30 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
+import Note from './models/Note.js';
 
 dotenv.config();
 
 const app = express();
 
-app.get("/products", (req, res) => {
-    res.send("Server is ready");
+app.use(express.json());
+
+app.post("/api/products", async (req, res) => {
+    const note = req.body;
+    
+    if (!note.name || !note.note) {
+        return res.status(400).json({ success: false, message: "A name and note should be provided for each note!" });
+    }
+
+    const NewNote = new Note(note);
+
+    try {
+        await NewNote.save();
+        res.status(201).json({ success: true, data: NewNote, message: "A note was successfully created!" });
+    } catch (error) {
+        console.error("Error while creating note:", error.message);
+        res.status(500).json({ success: false, message: "Server Error: Could not create note" });
+    }
 });
 
 app.listen(3000, () => {
