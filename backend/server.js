@@ -9,6 +9,17 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api/products", async (req, res) => {
+    try {
+        // passing in empty curly braces returns all products in the database
+        const products = await Note.find({});
+        res.status(200).json({ success: true, data: products, message: "All notes successfully retreived" });
+    } catch (error) {
+        console.error("Error while retrieving notes:", error.message);
+        res.status(500).json({ success: false, message: "Server Error: Could not retrieve all notes" });
+    }
+})
+
 app.post("/api/products", async (req, res) => {
     const note = req.body;
     
